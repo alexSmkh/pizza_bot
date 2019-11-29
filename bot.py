@@ -454,7 +454,7 @@ def send_message_to_courier(bot, user_id):
     )
 
 
-def callback_wait_hour(bot, update, job_queue):
+def create_job_queue(bot, update, job_queue):
     one_hour = 3600
     job_queue.run_once(send_alert, one_hour, context=update.message.chat_id)
 
@@ -525,7 +525,7 @@ def run_bot():
     dispather.add_handler(
         MessageHandler(
             Filters.successful_payment,
-            callback_wait_hour,
+            create_job_queue,
             pass_job_queue=True
         )
     )
