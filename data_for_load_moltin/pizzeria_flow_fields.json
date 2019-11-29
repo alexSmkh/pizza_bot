@@ -1,0 +1,34 @@
+[
+  {
+    "name": "Address",
+    "slug": "address",
+    "field_type": "string",
+    "description": "Address",
+    "required": 1,
+    "flow_id": ""
+  },
+    {
+    "name": "Alias",
+    "slug": "alias",
+    "field_type": "string",
+    "description": "Alias",
+    "required": 1,
+    "flow_id": ""
+  },
+  {
+    "name": "Longitude",
+    "slug": "longitude",
+    "field_type": "float",
+    "description": "Longitude",
+    "required": 1,
+    "flow_id": ""
+  },
+  {
+    "name": "Latitude",
+    "slug": "latitude",
+    "field_type": "float",
+    "description": "Latitude",
+    "required": 1,
+    "flow_id": ""
+  }
+]
