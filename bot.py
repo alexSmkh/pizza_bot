@@ -456,7 +456,7 @@ def send_message_to_courier(bot, user_id):
 
 def create_job_queue(bot, update, job_queue):
     one_hour = 3600
-    job_queue.run_once(send_alert, one_hour, context=update.message.chat_id)
+    job_queue.run_once(send_alert, 3, context=update.message.chat_id)
 
 
 def send_alert(bot, job):
