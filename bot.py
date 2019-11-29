@@ -515,8 +515,7 @@ def run_bot():
         format='%(levelname)s:%(name)s:%(message)s'
     )
     logger.addHandler(LogsHandler())
-    req = {'proxy_url': 'https://45.79.39.170:8116/'}
-    updater = Updater(os.getenv('TELEGRAM_TOKEN'), request_kwargs=req)
+    updater = Updater(os.getenv('TELEGRAM_TOKEN'))
     dispather = updater.dispatcher
     dispather.add_handler(CommandHandler('start', handle_users_reply))
     dispather.add_handler(CallbackQueryHandler(handle_users_reply))
