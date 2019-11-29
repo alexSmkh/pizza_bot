@@ -296,11 +296,17 @@ def handle_waiting_user_location(bot, update):
 
         pizzerias = get_flow_entries('pizzeria')
         user_location = (full_address['latitude'], full_address['longitude'])
-        delivery_info, delivery_selection_buttons = \
+        delivery_info, delivery_selection_buttons, pizzeria_location = \
             get_ui_elements_for_delivery_handler(
                 user_entry_id,
                 user_location,
                 pizzerias
+            )
+        if pizzeria_location:
+            bot.send_location(
+                chat_id=update.message.chat_id,
+                latitude=pizzeria_location[0],
+                longitude=pizzeria_location[1],
             )
         bot.send_message(
             chat_id=update.message.chat_id,

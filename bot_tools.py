@@ -260,6 +260,15 @@ def get_ui_elements_for_delivery_handler(user_entry_id, user_location, pizzerias
         user_location,
         (nearest_pizzeria['latitude'], nearest_pizzeria['longitude']),
     )
+
+    if distance_to_pizzeria <= 50:
+        pizzeria_location = (
+            nearest_pizzeria['latitude'],
+            nearest_pizzeria['longitude']
+        )
+    else:
+        pizzeria_location = False
+
     delivery_info = get_info_about_delivery(
         nearest_pizzeria,
         distance_to_pizzeria
@@ -268,6 +277,6 @@ def get_ui_elements_for_delivery_handler(user_entry_id, user_location, pizzerias
         distance_to_pizzeria,
         user_entry_id
     )
-    return delivery_info, delivery_selection_buttons
+    return delivery_info, delivery_selection_buttons, pizzeria_location
 
 
