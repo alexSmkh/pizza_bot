@@ -12,7 +12,7 @@ class LogsHandler(logging.Handler):
 def send_report(report):
     updater = Updater(getenv('TELEGRAM_TOKEN'))
     user_id = getenv('DEVELOPER_ID')
-    # updater.bot.send_message(
-    #     chat_id=user_id,
-    #     text=report
-    # )
+    updater.bot.send_message(
+        chat_id=user_id,
+        text=report
+    )

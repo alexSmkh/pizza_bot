@@ -422,7 +422,7 @@ def handle_pre_checkout(bot, update):
         chat_id = query.from_user.id
         bot.answer_pre_checkout_query(pre_checkout_query_id=query.id, ok=True)
         bot.send_message(chat_id=chat_id, text='Спасибо за покупку!')
-        # send_message_to_courier(bot, query.from_user.id)
+        send_message_to_courier(bot, query.from_user.id)
         delete_user_data(database, query.from_user.id)
 
 
