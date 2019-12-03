@@ -65,7 +65,6 @@ def handle_menu(bot, update):
         )
         return 'MENU'
     elif type_of_callback == 'id':
-        delete_last_message(bot, update)
         product = get_product(callback_value)
         product_image_id = product['relationships']['main_image']['data']['id']
         bot.send_photo(
@@ -78,16 +77,17 @@ def handle_menu(bot, update):
                 product_id=callback_value
             ),
         )
+        delete_last_message(bot, update)
         return 'DESCRIPTION'
     elif type_of_callback == 'cart':
         user_cart_items = get_user_cart_items(user_id)
         cart_info = get_cart_info(user_cart_items)
-        delete_last_message(bot, update)
         bot.send_message(
             text=cart_info,
             chat_id=user_id,
             reply_markup=create_keyboard_for_cart(user_cart_items)
         )
+        delete_last_message(bot, update)
         return 'CART'
 
 
@@ -95,26 +95,25 @@ def handle_description(bot, update):
     type_of_callback, callback_value = update.callback_query.data.split('_')
     user_id = update.callback_query.message.chat_id
     if type_of_callback == 'menu':
-        delete_last_message(bot, update)
         bot.send_message(
             text='Выберите пиццу:',
             chat_id=user_id,
             reply_markup=create_menu(user_id)
         )
+        delete_last_message(bot, update)
         return 'MENU'
     elif type_of_callback == 'cart':
         user_cart_items = get_user_cart_items(user_id)
         cart_info = get_cart_info(user_cart_items)
-        delete_last_message(bot, update)
         bot.send_message(
             text=cart_info,
             chat_id=user_id,
             reply_markup=create_keyboard_for_cart(user_cart_items)
         )
+        delete_last_message(bot, update)
         return 'CART'
     elif type_of_callback == 'add':
         number_of_pizza = 1
-        delete_last_message(bot, update)
         bot.send_message(
             text='Выберите количество',
             chat_id=user_id,
@@ -123,6 +122,7 @@ def handle_description(bot, update):
                 product_id=callback_value
             )
         )
+        delete_last_message(bot, update)
         return 'SELECTION_QUANTITY_OF_PIZZAS'
 
 
@@ -185,19 +185,19 @@ def handle_cart(bot, update):
         )
         return 'CART'
     elif query == 'menu':
-        delete_last_message(bot, update)
         bot.send_message(
             text='Выберите пиццу:',
             chat_id=user_id,
             reply_markup=create_menu(user_id)
         )
+        delete_last_message(bot, update)
         return 'MENU'
     elif query == 'ordering':
-        delete_last_message(bot, update)
         bot.send_message(
             chat_id=user_id,
             text='Напишите, пожалуйста, своё имя.'
         )
+        delete_last_message(bot, update)
         return 'WAITING_USERNAME'
 
 
