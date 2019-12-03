@@ -136,7 +136,7 @@ def selection_quantity_of_pizzas(bot, update):
     product_id = data[2]
     user_id = update.callback_query.message.chat_id
     if type_of_query == 'minus':
-        if quantity_of_pizza <= 1:
+        if quantity_of_pizza <= 0:
             return 'SELECTION_QUANTITY_OF_PIZZAS'
         quantity_of_pizza -= 1
         bot.edit_message_reply_markup(
@@ -156,11 +156,11 @@ def selection_quantity_of_pizzas(bot, update):
     elif type_of_query == 'ok':
         if quantity_of_pizza > 0:
             add_product_to_cart(product_id, quantity_of_pizza, user_id)
-        bot.answer_callback_query(
-            update.callback_query.id,
-            text='Пицца добавлена в корзину',
-            show_alert=False
-        )
+            bot.answer_callback_query(
+                update.callback_query.id,
+                text='Пицца добавлена в корзину',
+                show_alert=False
+            )
         update.callback_query.data = f'id_{product_id}'
         return handle_menu(bot, update)
 
