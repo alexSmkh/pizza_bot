@@ -38,9 +38,8 @@ def delete_last_message(bot, update):
     )
 
 
-def handle_menu(bot, update):
+def handle_menu(bot, update, user_id, user_reply):
     if update.message:
-        user_id = update.message.chat_id
         bot.send_message(
             text='Выберите пиццу:',
             chat_id=user_id,
@@ -48,8 +47,7 @@ def handle_menu(bot, update):
         )
         return 'MENU'
 
-    type_of_callback, callback_value = update.callback_query.data.split('_')
-    user_id = update.callback_query.message.chat_id
+    type_of_callback, callback_value = user_reply.split('_')
     if type_of_callback == 'start':
         bot.send_message(
             text='Выберите пиццу:',
@@ -91,9 +89,8 @@ def handle_menu(bot, update):
         return 'CART'
 
 
-def handle_description(bot, update):
-    type_of_callback, callback_value = update.callback_query.data.split('_')
-    user_id = update.callback_query.message.chat_id
+def handle_description(bot, update, user_id, user_reply):
+    type_of_callback, callback_value = user_reply.split('_')
     if type_of_callback == 'menu':
         bot.send_message(
             text='Выберите пиццу:',
@@ -126,12 +123,11 @@ def handle_description(bot, update):
         return 'SELECTION_QUANTITY_OF_PIZZAS'
 
 
-def selection_quantity_of_pizzas(bot, update):
-    data = update.callback_query.data.split('_')
+def selection_quantity_of_pizzas(bot, update, user_id, user_reply):
+    data = user_reply.split('_')
     type_of_query = data[0]
     quantity_of_pizza = int(data[1])
     product_id = data[2]
-    user_id = update.callback_query.message.chat_id
     if type_of_query == 'minus':
         if quantity_of_pizza <= 0:
             return 'SELECTION_QUANTITY_OF_PIZZAS'
@@ -159,12 +155,11 @@ def selection_quantity_of_pizzas(bot, update):
                 show_alert=False
             )
         update.callback_query.data = f'id_{product_id}'
-        return handle_menu(bot, update)
+        return handle_menu(bot, update, user_id, user_reply)
 
 
-def handle_cart(bot, update):
-    query, callback_value = update.callback_query.data.split('_')
-    user_id = update.callback_query.message.chat_id
+def handle_cart(bot, update, user_id, user_reply):
+    query, callback_value = user_reply.split('_')
     if query == 'remove':
         delete_product_from_cart(
             user_id,
@@ -201,16 +196,16 @@ def handle_cart(bot, update):
         return 'WAITING_USERNAME'
 
 
-def handle_waiting_username(bot, update):
+def handle_waiting_username(bot, update, user_id, user_reply):
     if update.message:
-        username = update.message.text
-        database.set(f'user_{update.message.chat_id}:name', username)
+        username = user_reply
+        database.set(f'user_{user_id}:name', username)
         update.message.reply_text('Напишите Ваш номер телефона.')
     return 'WAITING_PHONE_NUMBER'
 
 
-def handle_waiting_phone_number(bot, update):
-    phone_number = update.message.text
+def handle_waiting_phone_number(bot, update, user_id, user_reply):
+    phone_number = user_reply
     clear_phone_number = is_phone_number_valid(phone_number)
     if not clear_phone_number:
         update.message.reply_text(
@@ -219,15 +214,12 @@ def handle_waiting_phone_number(bot, update):
                   'Попробуйте еще раз.')
         )
         return 'WAITING_PHONE_NUMBER'
-    database.set(
-        f'user_{update.message.chat_id}:phone_number',
-        clear_phone_number
-    )
-    username = database.get(
-        f'user_{update.message.chat_id}:name'
-    ).decode('utf-8')
+
+    database.set(f'user_{user_id}:phone_number', clear_phone_number)
+    username = database.get(f'user_{user_id}:name').decode('utf-8')
+
     bot.send_message(
-        chat_id=update.message.chat_id,
+        chat_id=user_id,
         text=(f'Проверьте введенные Вами данные.\n'
               f'Ваше имя: {username}\n' 
               f'Ваш номер телефона: {phone_number}'),
@@ -236,10 +228,10 @@ def handle_waiting_phone_number(bot, update):
     return 'HANDLE_CONFIRM_PERSONAL_DATA'
 
 
-def handle_confirm_personal_data(bot, update):
-    if update.callback_query.data == 'yes':
+def handle_confirm_personal_data(bot, update, user_id, user_reply):
+    if user_reply == 'yes':
         bot.send_message(
-            chat_id=update.callback_query.message.chat_id,
+            chat_id=user_id,
             text=('Нам нужно знать Ваше местоположение для доставки. '
                   'Или подсказать ближайшую пиццерию, ' 
                   'если Вы хотите забрать свой заказ сами.\n'
@@ -249,19 +241,17 @@ def handle_confirm_personal_data(bot, update):
         return 'WAITING_LOCATION'
     else:
         bot.send_message(
-            chat_id=update.callback_query.message.chat_id,
+            chat_id=user_id,
             text='Введите данные еще раз.',
         )
 
 
-def handle_waiting_user_location(bot, update):
-    phone_number = database.get(
-        f'user_{update.message.chat_id}:phone_number'
-    ).decode('utf-8')
+def handle_waiting_user_location(bot, update, user_id, user_reply):
+    phone_number = database.get(f'user_{user_id}:phone_number').decode('utf-8')
 
     if update.callback_query:
         bot.send_message(
-            chat_id=update.callback_query.message.chat_id,
+            chat_id=user_id,
             text='Напишите ваш адрес.'
         )
         return 'WAITING_LOCATION'
@@ -270,24 +260,24 @@ def handle_waiting_user_location(bot, update):
         longitude = update.message.location.longitude
         latitude = update.message.location.latitude
         current_position = f'{latitude} {longitude}'
-    elif update.message.text == f'{WRITING} Напишу адрес':
+    elif user_reply == f'{WRITING} Напишу адрес':
         return 'WAITING_LOCATION'
     else:
-        current_position = update.message.text
+        current_position = user_reply
 
     full_address = get_geodata(current_position)
     if not full_address:
         bot.send_message(
-            chat_id=update.message.chat_id,
+            chat_id=user_id,
             text=(
                 'Вы, вероятно, ошиблись при вводе адреса. '
                 'Напишите, пожалуйста, еще раз.'
             )
         )
         return 'WAITING_LOCATION'
-    
+
     customer_address_data = get_customer_address_for_creating_entry(
-        update.message.chat_id,
+        user_id,
         full_address['longitude'],
         full_address['latitude'],
         phone_number
@@ -296,7 +286,7 @@ def handle_waiting_user_location(bot, update):
         CUSTOMER_ADDRESS_SLUG,
         customer_address_data
     )['id']
-    database.set(f'user_{update.message.chat_id}:entry_id', user_entry_id)
+    database.set(f'user_{user_id}:entry_id', user_entry_id)
     pizzerias = get_flow_entries('pizzeria')
     user_location = (full_address['latitude'], full_address['longitude'])
     delivery_info, delivery_selection_buttons, pizzeria_location = \
@@ -307,36 +297,35 @@ def handle_waiting_user_location(bot, update):
         )
     if pizzeria_location:
         bot.send_location(
-            chat_id=update.message.chat_id,
+            chat_id=user_id,
             latitude=pizzeria_location[0],
             longitude=pizzeria_location[1],
         )
     bot.send_message(
-        chat_id=update.message.chat_id,
+        chat_id=user_id,
         text=delivery_info,
         reply_markup=delivery_selection_buttons
     )
     return 'WAITING_FOR_DELIVERY_SELECTION'
 
 
-def handle_delivery_selection(bot, update):
-    chat_id = update.callback_query.message.chat_id
+def handle_delivery_selection(bot, update, user_id, user_reply):
 
-    if update.callback_query.data == 'refusal':
+    if user_reply == 'refusal':
         bot.send_message(
-            chat_id=chat_id,
+            chat_id=user_id,
             text='Жаль, что Вы так далеко.'
         )
-        delete_cart(chat_id)
+        delete_cart(user_id)
         delete_flow_entry(
             CUSTOMER_ADDRESS_SLUG,
-            database.get(f'user_{chat_id}:entry_id').decode('utf-8')
+            database.get(f'user_{user_id}:entry_id').decode('utf-8')
         )
-        delete_user_data(database, chat_id)
-        update.callback_query.data = 'start_'
-        return handle_menu(bot, update)
+        delete_user_data(database, user_id)
+        user_reply = 'start_'
+        return handle_menu(bot, update, user_id, user_reply)
 
-    query, user_entry_id = update.callback_query.data.split('_')
+    query, user_entry_id = user_reply.split('_')
     user_entry = get_flow_entries(CUSTOMER_ADDRESS_SLUG, user_entry_id)
     user_latitude = user_entry['latitude']
     user_longitude = user_entry['longitude']
@@ -351,7 +340,7 @@ def handle_delivery_selection(bot, update):
     if query == 'delivery':
         shipping_price = get_shipping_price(distance_to_pizzeria)
         bot.send_message(
-            chat_id=chat_id,
+            chat_id=user_id,
             text=('Мы уже начали собирать Ваш заказ!\n'
                   'После оплаты наш курьер доставит его в пределах 1ч.'),
             reply_markup=InlineKeyboardMarkup(
@@ -361,18 +350,18 @@ def handle_delivery_selection(bot, update):
         return 'PAYMENT'
     elif query == 'pickup':
         bot.send_message(
-            chat_id=chat_id,
+            chat_id=user_id,
             text=('Забрать заказ можно по адресу:\n'
                   f'{nearest_pizzeria["address"]}.')
         )
         bot.send_location(
-            chat_id=chat_id,
+            chat_id=user_id,
             latitude=nearest_pizzeria['latitude'],
             longitude=nearest_pizzeria['longitude'],
         )
         shipping_price = 0
         bot.send_message(
-            chat_id=chat_id,
+            chat_id=user_id,
             text='Осталось оплатить заказ.',
             reply_markup=InlineKeyboardMarkup(
                 [[get_payment_button(shipping_price)]]
@@ -381,9 +370,8 @@ def handle_delivery_selection(bot, update):
         return 'PAYMENT'
 
 
-def handle_payment(bot, update):
-    user_id = update.callback_query.message.chat_id
-    shipping_price = int(update.callback_query.data)
+def handle_payment(bot, update, user_id, user_reply):
+    shipping_price = int(user_reply)
     order_price = get_user_cart(user_id)['meta']['display_price']['with_tax']['amount']
     order_info = get_order_info_for_invoice(
         get_user_cart_items(user_id),
@@ -505,7 +493,7 @@ def handle_users_reply(bot, update):
     }
     state_handler = states[user_state]
     try:
-        next_state = state_handler(bot, update)
+        next_state = state_handler(bot, update, chat_id, user_reply)
         database.set(f'user_{chat_id}:state', next_state)
     except Exception as err:
         logger.exception(f'Ошибка: {err}')
