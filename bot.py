@@ -154,7 +154,7 @@ def selection_quantity_of_pizzas(bot, update, user_id, user_reply):
                 text='Пицца добавлена в корзину',
                 show_alert=False
             )
-        update.callback_query.data = f'id_{product_id}'
+        user_reply = f'id_{product_id}'
         return handle_menu(bot, update, user_id, user_reply)
 
 
