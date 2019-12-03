@@ -258,65 +258,65 @@ def handle_waiting_user_location(bot, update):
     phone_number = database.get(
         f'user_{update.message.chat_id}:phone_number'
     ).decode('utf-8')
-    if update.message:
-        if update.message.location:
-            longitude = update.message.location.longitude
-            latitude = update.message.location.latitude
-            current_position = f'{latitude} {longitude}'
-        elif update.message.text == f'{WRITING} Напишу адрес':
-            return 'WAITING_LOCATION'
-        else:
-            current_position = update.message.text
 
-        full_address = get_geodata(current_position)
-        if not full_address:
-            bot.send_message(
-                chat_id=update.message.chat_id,
-                text=(
-                    'Вы, вероятно, ошиблись при вводе адреса. '
-                    'Напишите, пожалуйста, еще раз.'
-                )
-            )
-            return 'WAITING_LOCATION'
-
-        customer_address_data = get_customer_address_for_creating_entry(
-            update.message.chat_id,
-            full_address['longitude'],
-            full_address['latitude'],
-            phone_number
-        )
-        user_entry_id = create_flow_entry(
-            CUSTOMER_ADDRESS_SLUG,
-            customer_address_data
-        )['id']
-        database.set(f'user_{update.message.chat_id}:entry_id', user_entry_id)
-
-        pizzerias = get_flow_entries('pizzeria')
-        user_location = (full_address['latitude'], full_address['longitude'])
-        delivery_info, delivery_selection_buttons, pizzeria_location = \
-            get_ui_elements_for_delivery_handler(
-                user_entry_id,
-                user_location,
-                pizzerias
-            )
-        if pizzeria_location:
-            bot.send_location(
-                chat_id=update.message.chat_id,
-                latitude=pizzeria_location[0],
-                longitude=pizzeria_location[1],
-            )
-        bot.send_message(
-            chat_id=update.message.chat_id,
-            text=delivery_info,
-            reply_markup=delivery_selection_buttons
-        )
-        return 'WAITING_FOR_DELIVERY_SELECTION'
-    elif update.callback_query:
+    if update.callback_query:
         bot.send_message(
             chat_id=update.callback_query.message.chat_id,
             text='Напишите ваш адрес.'
         )
         return 'WAITING_LOCATION'
+
+    if update.message.location:
+        longitude = update.message.location.longitude
+        latitude = update.message.location.latitude
+        current_position = f'{latitude} {longitude}'
+    elif update.message.text == f'{WRITING} Напишу адрес':
+        return 'WAITING_LOCATION'
+    else:
+        current_position = update.message.text
+
+    full_address = get_geodata(current_position)
+    if not full_address:
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text=(
+                'Вы, вероятно, ошиблись при вводе адреса. '
+                'Напишите, пожалуйста, еще раз.'
+            )
+        )
+        return 'WAITING_LOCATION'
+    
+    customer_address_data = get_customer_address_for_creating_entry(
+        update.message.chat_id,
+        full_address['longitude'],
+        full_address['latitude'],
+        phone_number
+    )
+    user_entry_id = create_flow_entry(
+        CUSTOMER_ADDRESS_SLUG,
+        customer_address_data
+    )['id']
+    database.set(f'user_{update.message.chat_id}:entry_id', user_entry_id)
+    pizzerias = get_flow_entries('pizzeria')
+    user_location = (full_address['latitude'], full_address['longitude'])
+    delivery_info, delivery_selection_buttons, pizzeria_location = \
+        get_ui_elements_for_delivery_handler(
+            user_entry_id,
+            user_location,
+            pizzerias
+        )
+    if pizzeria_location:
+        bot.send_location(
+            chat_id=update.message.chat_id,
+            latitude=pizzeria_location[0],
+            longitude=pizzeria_location[1],
+        )
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text=delivery_info,
+        reply_markup=delivery_selection_buttons
+    )
+    return 'WAITING_FOR_DELIVERY_SELECTION'
 
 
 def handle_delivery_selection(bot, update):
