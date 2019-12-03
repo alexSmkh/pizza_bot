@@ -49,8 +49,8 @@ def handle_menu(bot, update):
         return 'MENU'
 
     type_of_callback, callback_value = update.callback_query.data.split('_')
+    user_id = update.callback_query.message.chat_id
     if type_of_callback == 'start':
-        user_id = update.callback_query.message.chat_id
         bot.send_message(
             text='Выберите пиццу:',
             chat_id=user_id,
@@ -58,7 +58,6 @@ def handle_menu(bot, update):
         )
         return 'MENU'
     elif type_of_callback == 'page':
-        user_id = update.callback_query.message.chat_id
         bot.edit_message_reply_markup(
             chat_id=user_id,
             message_id=update.callback_query.message.message_id,
@@ -67,7 +66,6 @@ def handle_menu(bot, update):
         return 'MENU'
     elif type_of_callback == 'id':
         delete_last_message(bot, update)
-        user_id = update.callback_query.message.chat_id
         product = get_product(callback_value)
         product_image_id = product['relationships']['main_image']['data']['id']
         bot.send_photo(
@@ -82,7 +80,6 @@ def handle_menu(bot, update):
         )
         return 'DESCRIPTION'
     elif type_of_callback == 'cart':
-        user_id = update.callback_query.message.chat_id
         user_cart_items = get_user_cart_items(user_id)
         cart_info = get_cart_info(user_cart_items)
         delete_last_message(bot, update)
