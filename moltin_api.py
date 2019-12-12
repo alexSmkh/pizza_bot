@@ -199,6 +199,13 @@ def upload_file_to_moltin(filepath):
     return response.json()
 
 
+def get_file_by_id(id):
+    url = f'https://api.moltin.com/v2/files/{id}'
+    headers = get_default_header()
+    response = request_api('get', url=url, headers=headers)
+    return response.json()['data']
+
+
 def create_product(product_data):
     url = 'https://api.moltin.com/v2/products'
     headers = get_default_header()

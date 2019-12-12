@@ -17,6 +17,11 @@ def get_product_info(product_data):
     return f'{PIZZA} *{name}*\n\n{description}\n*Цена: {price}*{RUB}'
 
 
+def get_short_description(description):
+    short_description = description.split('\n')[0]
+    return short_description.strip('Состав: ')
+
+
 def get_cart_info(user_cart_items):
     cart_info = str()
     total_price = 0

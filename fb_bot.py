@@ -3,8 +3,8 @@ import os
 import requests
 from flask import Flask, request
 
+from fb_tools import get_product_cards
 from dotenv import load_dotenv
-
 
 app = Flask(__name__)
 FACEBOOK_TOKEN = os.getenv("PAGE_ACCESS_TOKEN")
@@ -37,22 +37,30 @@ def webhook():
                     recipient_id = messaging_event["recipient"]["id"]
                     message_text = messaging_event["message"]["text"]
                     send_message(sender_id, message_text)
-    return "ok", 200
+    return "OK", 200
 
 
 def send_message(recipient_id, message_text):
+    product_cards = get_product_cards()
     params = {"access_token": FACEBOOK_TOKEN}
     headers = {"Content-Type": "application/json"}
     request_content = {
         "recipient": {
-            "id": recipient_id
+            "id": recipient_id,
         },
         "message": {
-            "text": message_text
+            "attachment": {
+                "type": "template",
+                "payload": {
+                    "template_type": "generic",
+                    "elements": product_cards
+                }
+            }
         }
     }
+
     response = requests.post(
-        "https://graph.facebook.com/v2.6/me/messages",
+        "https://graph.facebook.com/v5.0/me/messages",
         params=params, headers=headers, json=request_content
     )
     response.raise_for_status()
