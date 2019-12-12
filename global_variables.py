@@ -16,5 +16,10 @@ MINUS = u'\U00002796'
 OK = u'\U0001F197'
 CROSS_MARK = u'\U0000274C'
 WALKING = u'\U0001F6B6'
+SHOPPING_BAGS = u'\U0001F6CD'
+
+
+#IMG
+PIZZERIA_LOGO_URL = 'https://image.freepik.com/free-vector/pizza-logo-design-template_15146-192.jpg'
 
 

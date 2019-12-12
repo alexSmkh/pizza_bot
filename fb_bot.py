@@ -3,7 +3,7 @@ import os
 import requests
 from flask import Flask, request
 
-from fb_tools import get_product_cards
+from fb_tools import get_menu
 from dotenv import load_dotenv
 
 app = Flask(__name__)
@@ -41,7 +41,7 @@ def webhook():
 
 
 def send_message(recipient_id, message_text):
-    product_cards = get_product_cards()
+    menu = get_menu()
     params = {"access_token": FACEBOOK_TOKEN}
     headers = {"Content-Type": "application/json"}
     request_content = {
@@ -53,7 +53,7 @@ def send_message(recipient_id, message_text):
                 "type": "template",
                 "payload": {
                     "template_type": "generic",
-                    "elements": product_cards
+                    "elements": menu
                 }
             }
         }
