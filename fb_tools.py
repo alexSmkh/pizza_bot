@@ -1,7 +1,18 @@
-from moltin_api import get_products, get_file_by_id
+from moltin_api import (get_file_by_id, get_products_of_category,
+                        get_all_categories)
 from global_variables import (SHOPPING_CART, CHECK_MARK, RUB, SHOPPING_BAGS,
-                              CREDIT_CARD, PIZZERIA_LOGO_URL)
+                              CREDIT_CARD, PIZZERIA_LOGO_URL, LAST_CARD_IMG,
+                              PIZZA)
 from utils import get_short_description
+
+
+def translate_category_name(name):
+    return {
+        'Main': 'Основные',
+        'Spicy': 'Острые',
+        'Special': 'Особые',
+        'Nutritious': 'Сытные'
+    }[name]
 
 
 def get_main_card():
@@ -30,13 +41,33 @@ def get_main_card():
     }]
 
 
-def get_menu():
-    number_of_pizzas_in_carousel = 5
-    products = get_products()[:number_of_pizzas_in_carousel]
+def get_last_card(current_category):
+    buttons = []
+    for category in get_all_categories():
+        if category['name'] == current_category:
+            continue
+        buttons.append(
+            {
+                'type': 'postback',
+                'title': translate_category_name(category["name"]),
+                'payload': category['name']
+            }
+        )
+
+    return {
+        'title': 'Не нашли нужную пиццу?',
+        'image_url': LAST_CARD_IMG,
+        'subtitle': 'Остальные пиццы можно посмотреть в одной из категорий',
+        'buttons': buttons
+    }
+
+
+def get_menu(category='Main'):
+    products = get_products_of_category(category)
     menu = get_main_card()
     product_cards = [
         {
-            "title": (f"{product['name']} "
+            "title": (f"{PIZZA} {product['name']} "
                       f"({product['meta']['display_price']['with_tax']['amount']}"
                       f"{RUB})"),
             "image_url": get_file_by_id(
@@ -54,4 +85,5 @@ def get_menu():
         for product in products
     ]
     menu.extend(product_cards)
+    menu.append(get_last_card(category))
     return menu

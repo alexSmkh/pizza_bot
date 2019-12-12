@@ -6,6 +6,7 @@ from flask import Flask, request
 from fb_tools import get_menu
 from dotenv import load_dotenv
 
+
 app = Flask(__name__)
 FACEBOOK_TOKEN = os.getenv("PAGE_ACCESS_TOKEN")
 
@@ -19,7 +20,6 @@ def verify():
         if not request.args.get("hub.verify_token") == os.environ["VERIFY_TOKEN"]:
             return "Verification token mismatch", 403
         return request.args["hub.challenge"], 200
-
     return "Hello world", 200
 
 
@@ -36,11 +36,11 @@ def webhook():
                     sender_id = messaging_event["sender"]["id"]
                     recipient_id = messaging_event["recipient"]["id"]
                     message_text = messaging_event["message"]["text"]
-                    send_message(sender_id, message_text)
+                    create_menu(sender_id, message_text)
     return "OK", 200
 
 
-def send_message(recipient_id, message_text):
+def create_menu(recipient_id, message_text):
     menu = get_menu()
     params = {"access_token": FACEBOOK_TOKEN}
     headers = {"Content-Type": "application/json"}

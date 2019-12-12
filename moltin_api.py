@@ -252,11 +252,36 @@ def link_category_and_product(product_id, category_id):
     url = f'https://api.moltin.com/v2/products/{product_id}/relationships/categories'
     headers = get_default_header()
     category = [{'type': 'category', 'id': category_id}]
-    data = {
-        'data': category
-    }
+    data = {'data': category}
     response = request_api('post', url=url, headers=headers, json=data)
+    return response
+
+
+def get_all_categories():
+    url = f'https://api.moltin.com/v2/categories'
+    headers = get_default_header()
+    return request_api('get', url=url, headers=headers).json()['data']
+
+
+def delete_all_categories():
+    headers = get_default_header()
+    for category in get_all_categories():
+        url = f'https://api.moltin.com/v2/categories/{category["id"]}'
+        request_api('delete', url=url, headers=headers)
+
+
+def get_category_by_name(name):
+    url = f'https://api.moltin.com/v2/categories'
+    headers = get_default_header()
+    params = {'filter': f'eq(name,{name})'}
+    response = request_api('get', url=url, headers=headers, params=params)
     return response.json()['data']
+
+
+def get_products_of_category(category_name):
+    category = get_category_by_name(category_name)
+    product_ids = category[0]['relationships']['products']['data']
+    return [get_product(product['id']) for product in product_ids]
 
 
 def create_flow(flow_name):

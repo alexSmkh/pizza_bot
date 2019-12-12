@@ -19,7 +19,7 @@ WALKING = u'\U0001F6B6'
 SHOPPING_BAGS = u'\U0001F6CD'
 
 
-#IMG
+# IMG
 PIZZERIA_LOGO_URL = 'https://image.freepik.com/free-vector/pizza-logo-design-template_15146-192.jpg'
-
+LAST_CARD_IMG = 'https://primepizza.ru/uploads/position/large_0c07c6fd5c4dcadddaf4a2f1a2c218760b20c396.jpg'
 
