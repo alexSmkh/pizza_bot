@@ -234,6 +234,31 @@ def create_product(product_data):
     return response.json()
 
 
+def create_category(slug):
+    url = 'https://api.moltin.com/v2/categories'
+    headers = get_default_header()
+    data = {
+        'data': {
+            'type': 'category',
+            'name': slug.capitalize(),
+            'slug': f'{slug}_pizzas'
+        }
+    }
+    response = request_api('post', url=url, headers=headers, json=data)
+    return response.json()['data']
+
+
+def link_category_and_product(product_id, category_id):
+    url = f'https://api.moltin.com/v2/products/{product_id}/relationships/categories'
+    headers = get_default_header()
+    category = [{'type': 'category', 'id': category_id}]
+    data = {
+        'data': category
+    }
+    response = request_api('post', url=url, headers=headers, json=data)
+    return response.json()['data']
+
+
 def create_flow(flow_name):
     url = 'https://api.moltin.com/v2/flows'
     headers = get_default_header()
