@@ -6,9 +6,63 @@ from flask import Flask, request
 from fb_tools import get_menu
 from dotenv import load_dotenv
 
+from redis_db import get_database_connection
 
 app = Flask(__name__)
+database = None
 FACEBOOK_TOKEN = os.getenv("PAGE_ACCESS_TOKEN")
+
+
+def handle_start(sender_id, message_text):
+    menu = get_menu()
+    params = {"access_token": FACEBOOK_TOKEN}
+    headers = {"Content-Type": "application/json"}
+    request_content = {
+        "recipient": {
+            "id": sender_id,
+        },
+        "message": {
+            "attachment": {
+                "type": "template",
+                "payload": {
+                    "template_type": "generic",
+                    "elements": menu
+                }
+            }
+        }
+    }
+
+    response = requests.post(
+        "https://graph.facebook.com/v5.0/me/messages",
+        params=params, headers=headers, json=request_content
+    )
+    # response.raise_for_status()
+    return 'MENU'
+
+
+def handle_menu():
+    pass
+
+
+def handle_users_reply(sender_id, message_text):
+    global database
+    database = get_database_connection(database)
+
+    states_functions = {
+        'START': handle_start,
+    }
+    formatted_sender_id = f'fb:user_{sender_id}'
+    recorded_state = database.get(formatted_sender_id)
+    if not recorded_state or recorded_state.decode(
+            "utf-8") not in states_functions.keys():
+        user_state = "START"
+    else:
+        user_state = recorded_state.decode("utf-8")
+    if message_text == "/start":
+        user_state = "START"
+    state_handler = states_functions[user_state]
+    next_state = state_handler(sender_id, message_text)
+    database.set(formatted_sender_id, next_state)
 
 
 @app.route('/', methods=['GET'])
@@ -36,34 +90,8 @@ def webhook():
                     sender_id = messaging_event["sender"]["id"]
                     recipient_id = messaging_event["recipient"]["id"]
                     message_text = messaging_event["message"]["text"]
-                    create_menu(sender_id, message_text)
+                    handle_users_reply(sender_id, message_text)
     return "OK", 200
-
-
-def create_menu(recipient_id, message_text):
-    menu = get_menu()
-    params = {"access_token": FACEBOOK_TOKEN}
-    headers = {"Content-Type": "application/json"}
-    request_content = {
-        "recipient": {
-            "id": recipient_id,
-        },
-        "message": {
-            "attachment": {
-                "type": "template",
-                "payload": {
-                    "template_type": "generic",
-                    "elements": menu
-                }
-            }
-        }
-    }
-
-    response = requests.post(
-        "https://graph.facebook.com/v5.0/me/messages",
-        params=params, headers=headers, json=request_content
-    )
-    response.raise_for_status()
 
 
 if __name__ == '__main__':

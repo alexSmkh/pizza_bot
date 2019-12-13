@@ -49,7 +49,7 @@ def get_last_card(current_category):
         buttons.append(
             {
                 'type': 'postback',
-                'title': translate_category_name(category["name"]),
+                'title': f'{PIZZA} {translate_category_name(category["name"])} {PIZZA}',
                 'payload': category['name']
             }
         )
