@@ -13,8 +13,10 @@ database = None
 FACEBOOK_TOKEN = os.getenv("PAGE_ACCESS_TOKEN")
 
 
-def handle_start(sender_id, message_text):
-    menu = get_menu()
+def handle_start(sender_id, user_reply):
+    menu = get_menu(user_reply) if user_reply in PIZZA_CATEGORIES.keys() \
+        else get_menu()
+
     params = {"access_token": FACEBOOK_TOKEN}
     headers = {"Content-Type": "application/json"}
     request_content = {
@@ -40,16 +42,18 @@ def handle_start(sender_id, message_text):
     return 'MENU'
 
 
-def handle_menu():
-    pass
+def handle_menu(sender_id, user_reply):
+    if user_reply in PIZZA_CATEGORIES:
+        return handle_start(sender_id, user_reply)
 
 
-def handle_users_reply(sender_id, message_text):
+def handle_users_reply(sender_id, user_reply):
     global database
     database = get_database_connection(database)
 
     states_functions = {
         'START': handle_start,
+        'MENU': handle_menu,
     }
     formatted_sender_id = f'fb:user_{sender_id}'
     recorded_state = database.get(formatted_sender_id)
@@ -58,11 +62,14 @@ def handle_users_reply(sender_id, message_text):
         user_state = "START"
     else:
         user_state = recorded_state.decode("utf-8")
-    if message_text == "/start":
+    if user_reply == "/start":
         user_state = "START"
     state_handler = states_functions[user_state]
-    next_state = state_handler(sender_id, message_text)
-    database.set(formatted_sender_id, next_state)
+    try:
+        next_state = state_handler(sender_id, user_reply)
+        database.set(formatted_sender_id, next_state)
+    except Exception as err:
+        print(err)
 
 
 @app.route('/', methods=['GET'])
@@ -89,8 +96,13 @@ def webhook():
                 if messaging_event.get("message"):
                     sender_id = messaging_event["sender"]["id"]
                     recipient_id = messaging_event["recipient"]["id"]
-                    message_text = messaging_event["message"]["text"]
-                    handle_users_reply(sender_id, message_text)
+                    user_reply = messaging_event["message"]["text"]
+                    handle_users_reply(sender_id, user_reply)
+                elif messaging_event.get("postback"):
+                    sender_id = messaging_event["sender"]["id"]
+                    recipient_id = messaging_event["recipient"]["id"]
+                    user_reply = messaging_event['postback']['payload']
+                    handle_users_reply(sender_id, user_reply)
     return "OK", 200
 
 

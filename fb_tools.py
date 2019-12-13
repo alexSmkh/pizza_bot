@@ -2,17 +2,8 @@ from moltin_api import (get_file_by_id, get_products_of_category,
                         get_all_categories)
 from global_variables import (SHOPPING_CART, CHECK_MARK, RUB, SHOPPING_BAGS,
                               CREDIT_CARD, PIZZERIA_LOGO_URL, LAST_CARD_IMG,
-                              PIZZA)
+                              PIZZA, PIZZA_CATEGORIES)
 from utils import get_short_description
-
-
-def translate_category_name(name):
-    return {
-        'Main': 'Основные',
-        'Spicy': 'Острые',
-        'Special': 'Особые',
-        'Nutritious': 'Сытные'
-    }[name]
 
 
 def get_main_card():
@@ -49,7 +40,7 @@ def get_last_card(current_category):
         buttons.append(
             {
                 'type': 'postback',
-                'title': f'{PIZZA} {translate_category_name(category["name"])} {PIZZA}',
+                'title': f'{PIZZA} {PIZZA_CATEGORIES[category["name"]]} {PIZZA}',
                 'payload': category['name']
             }
         )
