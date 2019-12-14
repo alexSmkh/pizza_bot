@@ -6,7 +6,7 @@ from flask import Flask, request
 from fb_tools import get_menu, get_cart
 from dotenv import load_dotenv
 
-from moltin_api import add_product_to_cart
+from moltin_api import add_product_to_cart, delete_product_from_cart
 from redis_db import get_database_connection
 from global_variables import PIZZA_CATEGORIES
 
@@ -87,7 +87,12 @@ def handle_cart(sender_id, user_reply):
         send_message(sender_id, 'Добавлена еще одна пицца.', True)
         return handle_menu(sender_id, 'cart')
     elif callback_type == 'remove':
-        pass
+        delete_product_from_cart(
+            f'fb:cart_{sender_id}',
+            value
+        )
+        send_message(sender_id, 'Пицца удалена из корзины.', True)
+        return handle_menu(sender_id, 'cart')
     elif callback_type == 'menu':
         pass
     elif callback_type == 'delivery':
