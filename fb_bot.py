@@ -81,7 +81,11 @@ def handle_cart(sender_id, user_reply):
     callback_type, value = user_reply.split('_')
 
     if callback_type == 'add':
-        pass
+        number_of_pizza = 1
+        cart_id = f'fb:cart_{sender_id}'
+        add_product_to_cart(value, number_of_pizza, cart_id)
+        send_message(sender_id, 'Добавлена еще одна пицца.', True)
+        return handle_menu(sender_id, 'cart')
     elif callback_type == 'remove':
         pass
     elif callback_type == 'menu':
