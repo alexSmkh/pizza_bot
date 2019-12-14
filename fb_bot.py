@@ -1,4 +1,5 @@
 import os
+import logging
 
 import requests
 from flask import Flask, request
@@ -9,14 +10,18 @@ from dotenv import load_dotenv
 from moltin_api import add_product_to_cart, delete_product_from_cart
 from redis_db import get_database_connection
 from global_variables import PIZZA_CATEGORIES
+from custom_logger import LogsHandler
+
+import traceback
 
 
 app = Flask(__name__)
 database = None
+logger = logging.getLogger('FB logger')
 FACEBOOK_TOKEN = os.getenv("PAGE_ACCESS_TOKEN")
 
 
-def get_default_params(sender_id):
+def get_default_data_for_request(sender_id):
     params = {"access_token": FACEBOOK_TOKEN}
     headers = {"Content-Type": "application/json"}
     request_content = {
@@ -28,7 +33,7 @@ def get_default_params(sender_id):
 
 
 def send_message(sender_id, data, is_text_message=False):
-    params, headers, request_content = get_default_params(sender_id)
+    params, headers, request_content = get_default_data_for_request(sender_id)
 
     if is_text_message:
         request_content.update({"message": {"text": data}})
@@ -66,7 +71,7 @@ def handle_menu(sender_id, user_reply):
         send_message(sender_id, cart)
         return 'CART'
     elif user_reply == 'order':
-        pass
+        return 'MENU'
 
     callback_type, value = user_reply.split('_')
     if callback_type == 'add':
@@ -81,9 +86,9 @@ def handle_cart(sender_id, user_reply):
     if user_reply == 'menu':
         return handle_start(sender_id, '/start')
     elif user_reply == 'delivery':
-        pass
+        return 'CART'
     elif user_reply == 'pickup':
-        pass
+        return 'CART'
 
     callback_type, value = user_reply.split('_')
 
@@ -123,7 +128,10 @@ def handle_users_reply(sender_id, user_reply):
         next_state = state_handler(sender_id, user_reply)
         database.set(formatted_sender_id, next_state)
     except Exception as err:
-        print(err)
+        logger.exception(
+            f'FB: Ошибка - {err}'
+            f'{traceback.format_exc()}'
+        )
 
 
 @app.route('/', methods=['GET'])
@@ -162,4 +170,6 @@ def webhook():
 
 if __name__ == '__main__':
     load_dotenv()
+    logger.addHandler(LogsHandler())
     app.run(debug=True)
+    logger.info('FB bot is running')
