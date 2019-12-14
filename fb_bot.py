@@ -78,6 +78,13 @@ def handle_menu(sender_id, user_reply):
 
 
 def handle_cart(sender_id, user_reply):
+    if user_reply == 'menu':
+        return handle_start(sender_id, '/start')
+    elif user_reply == 'delivery':
+        pass
+    elif user_reply == 'pickup':
+        pass
+
     callback_type, value = user_reply.split('_')
 
     if callback_type == 'add':
@@ -86,19 +93,11 @@ def handle_cart(sender_id, user_reply):
         add_product_to_cart(value, number_of_pizza, cart_id)
         send_message(sender_id, 'Добавлена еще одна пицца.', True)
         return handle_menu(sender_id, 'cart')
+
     elif callback_type == 'remove':
-        delete_product_from_cart(
-            f'fb:cart_{sender_id}',
-            value
-        )
+        delete_product_from_cart(f'fb:cart_{sender_id}', value)
         send_message(sender_id, 'Пицца удалена из корзины.', True)
         return handle_menu(sender_id, 'cart')
-    elif callback_type == 'menu':
-        pass
-    elif callback_type == 'delivery':
-        pass
-    elif callback_type == 'pickup':
-        pass
 
 
 def handle_users_reply(sender_id, user_reply):

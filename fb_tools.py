@@ -95,17 +95,17 @@ def get_main_card_for_cart(cart_id):
                 {
                     'type': 'postback',
                     'title': f'{DELIVERY} Доставка',
-                    'payload': f'delivery_{cart_id}'
+                    'payload': f'delivery'
                 },
                 {
                     'type': 'postback',
                     'title': f'{WALKING} Самовывоз',
-                    'payload': f'pickup_{cart_id}'
+                    'payload': f'pickup'
                 },
                 {
                     'type': 'postback',
                     'title': f'{LEFTWARDS_ARROW} К меню',
-                    'payload': f'menu_{cart_id}'
+                    'payload': f'menu'
                 },
 
             ]
