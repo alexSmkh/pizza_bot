@@ -1,9 +1,13 @@
 # Pizza Bot
-Телеграм бот для пиццерии, серверная сторона которого реализована на
+Бот для пиццерии, работающий в Telegram и Facebook, серверная сторона которого реализована на
  [Moltin](https://www.moltin.com/).
 
-## Пример работы бота:
+## Пример работы бота в Telegram:
 ![](bot_sample.gif)
+
+## Пример работы бота в Facebook
+![](fb_bot_sample.gif)
+
  
 ## Как настроить для работы с Telegram
 * Создайте файл `.env` и положите в папку со скриптами
@@ -19,6 +23,16 @@ TELEGRAM_TOKEN=token
 DEVELOPER_ID=id
 PROVIDER_TOKEN=payment_token
 ```
+
+
+## Как настроить для Facebook
+* Получите токен, [следуя инструкции](https://gist.github.com/voron434/3765d14574067d17aa9e676145df360e)
+* Запишите его и токен для webhook в  `.env`
+```text
+PAGE_ACCESS_TOKEN=token
+VERIFY_TOKEN=webhook_token
+```
+
 
 ## Как настроить для Moltin 
 * Зарегистрируйтесь на [Moltin](https://www.moltin.com)
