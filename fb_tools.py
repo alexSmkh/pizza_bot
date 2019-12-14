@@ -1,3 +1,4 @@
+from cache import get_menu_from_cache
 from moltin_api import (get_file_by_id, get_products_of_category,
                         get_all_categories, get_user_cart_item_ids,
                         get_user_cart_items, get_user_cart)
@@ -57,7 +58,7 @@ def get_last_card_for_menu(current_category):
 
 
 def get_menu(category='Main'):
-    products = get_products_of_category(category)
+    products = get_menu_from_cache()[category]
     menu = get_main_card_for_menu()
     product_cards = [
         {
