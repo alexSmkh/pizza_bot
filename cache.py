@@ -22,7 +22,6 @@ def cache_menu():
         if database is None:
             database = get_database_connection(database)
         database.set('menu', str(menu))
-        get_menu_from_cache()
         time.sleep(300)
 
 
