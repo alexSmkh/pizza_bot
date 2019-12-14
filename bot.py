@@ -199,7 +199,7 @@ def handle_cart(bot, update, user_id, user_reply):
 def handle_waiting_username(bot, update, user_id, user_reply):
     if update.message:
         username = user_reply
-        database.set(f'user_{user_id}:name', username)
+        database.set(f'tg:user_{user_id}:name', username)
         update.message.reply_text('Напишите Ваш номер телефона.')
     return 'WAITING_PHONE_NUMBER'
 
@@ -216,7 +216,7 @@ def handle_waiting_phone_number(bot, update, user_id, user_reply):
         return 'WAITING_PHONE_NUMBER'
 
     database.set(f'user_{user_id}:phone_number', clear_phone_number)
-    username = database.get(f'user_{user_id}:name').decode('utf-8')
+    username = database.get(f'tg:user_{user_id}:name').decode('utf-8')
 
     bot.send_message(
         chat_id=user_id,
@@ -415,7 +415,7 @@ def send_message_to_courier(bot, user_id):
     user_cart_items = get_user_cart_items(user_id)
     username = database.get(f'user_{user_id}:name').decode('utf-8')
     user_phone_number = database.get(
-        f'user_{user_id}:phone_number'
+        f'tg:user_{user_id}:phone_number'
     ).decode('utf-8')
     order_info = get_order_info_for_courier(
         user_cart_items,
@@ -473,10 +473,10 @@ def handle_users_reply(bot, update):
         return
 
     if user_reply == '/start':
-        database.set(f'user_{chat_id}:state', 'MENU')
+        database.set(f'tg:user_{chat_id}:state', 'MENU')
         user_state = 'MENU'
     else:
-        user_state = database.get(f'user_{chat_id}:state').decode('utf-8')
+        user_state = database.get(f'tg:user_{chat_id}:state').decode('utf-8')
 
     states = {
         'MENU': handle_menu,
@@ -494,7 +494,7 @@ def handle_users_reply(bot, update):
     state_handler = states[user_state]
     try:
         next_state = state_handler(bot, update, chat_id, user_reply)
-        database.set(f'user_{chat_id}:state', next_state)
+        database.set(f'tg:user_{chat_id}:state', next_state)
     except Exception as err:
         logger.exception(f'Ошибка: {err}')
 

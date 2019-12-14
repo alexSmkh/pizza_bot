@@ -16,5 +16,18 @@ MINUS = u'\U00002796'
 OK = u'\U0001F197'
 CROSS_MARK = u'\U0000274C'
 WALKING = u'\U0001F6B6'
+SHOPPING_BAGS = u'\U0001F6CD'
 
 
+# IMG
+PIZZERIA_LOGO_URL = 'https://image.freepik.com/free-vector/pizza-logo-design-template_15146-192.jpg'
+LAST_CARD_IMG = 'https://primepizza.ru/uploads/position/large_0c07c6fd5c4dcadddaf4a2f1a2c218760b20c396.jpg'
+CART_LOGO = 'https://internet-marketings.ru/wp-content/uploads/2018/08/idealnaya-korzina-internet-magazina-1068x713.jpg'
+
+
+PIZZA_CATEGORIES = {
+        'Main': 'Основные',
+        'Spicy': 'Острые',
+        'Special': 'Особые',
+        'Nutritious': 'Сытные'
+    }
