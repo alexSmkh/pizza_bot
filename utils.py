@@ -17,9 +17,14 @@ def get_product_info(product_data):
     return f'{PIZZA} *{name}*\n\n{description}\n*Цена: {price}*{RUB}'
 
 
-def get_short_description(description):
+def get_short_description_for_fb_menu(description):
     short_description = description.split('\n')[0]
     return short_description.strip('Состав: ')
+
+
+def get_short_description_for_fb_cart(product_info):
+    return (f'В корзине: {product_info["quantity"]}шт. '
+            f'На сумму: {product_info["value"]["amount"]}{RUB}')
 
 
 def get_cart_info(user_cart_items):
