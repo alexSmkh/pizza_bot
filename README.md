@@ -3,10 +3,10 @@
  [Moltin](https://www.moltin.com/).
 
 ## Пример работы бота в Telegram:
-![](bot_sample.gif)
+![](bot_samples/tg_bot_sample.gif)
 
 ## Пример работы бота в Facebook
-![](fb_bot_sample.gif)
+![](bot_samples/fb_bot_sample.gif)
 
  
 ## Как настроить для работы с Telegram
@@ -75,9 +75,10 @@ python load_products_to_moltin.py
 ```
 
 
-Запустить бота
+Запустить ботов для Telegram и Facebook
 ```bash
-python telegram_bot.py
+python tg_bot.py 
+python fb_bot.py
 ```
 
 ## Развертывание на Heroku

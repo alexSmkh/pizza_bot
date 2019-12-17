@@ -1,11 +1,11 @@
 import os
 import logging
 
-from bot_tools import (create_menu, create_keyboard_for_product_description,
-                       create_selection_buttons, create_keyboard_for_cart,
-                       create_keyboard_for_confirm,
-                       get_ui_elements_for_delivery_handler,
-                       get_payment_button, get_keyboard_for_location_request)
+from tg_bot_tools import (create_menu, create_keyboard_for_product_description,
+                          create_selection_buttons, create_keyboard_for_cart,
+                          create_keyboard_for_confirm,
+                          get_ui_elements_for_delivery_handler,
+                          get_payment_button, get_keyboard_for_location_request)
 from data_for_load_moltin.data_for_flow_fields import \
     get_customer_address_for_creating_entry, CUSTOMER_ADDRESS_SLUG
 from moltin_api import (get_product_image_url, get_product, add_product_to_cart,
@@ -506,7 +506,9 @@ def run_bot():
         format='%(levelname)s:%(name)s:%(message)s'
     )
     logger.addHandler(LogsHandler())
-    updater = Updater(os.getenv('TELEGRAM_TOKEN'))
+    req = {'proxy_url': 'https://158.69.62.161:3128/'}
+    updater = Updater(os.getenv('TELEGRAM_TOKEN'), request_kwargs=req)
+    # updater = Updater(os.getenv('TELEGRAM_TOKEN'))
     dispather = updater.dispatcher
     dispather.add_handler(CommandHandler('start', handle_users_reply))
     dispather.add_handler(CallbackQueryHandler(handle_users_reply))
