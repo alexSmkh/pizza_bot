@@ -3,10 +3,10 @@
  [Moltin](https://www.moltin.com/).
 
 ## Пример работы в Telegram:
-![](bot_sample.gif)
+![Telegram bot](bot_samples/tg_bot_sample.gif)
 
 ## Пример работы в Facebook
-![](fb_bot_sample.gif)
+![Facebook bot](bot_samples/fb_bot_sample.gif)
  
 ## Как настроить для работы с Telegram
 * Создайте файл `.env` и положите в папку со скриптами
