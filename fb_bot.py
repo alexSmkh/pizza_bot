@@ -152,19 +152,20 @@ def webhook():
     Основной вебхук, на который будут приходить сообщения от Facebook.
     """
     data = request.get_json()
-    if data["object"] == "page":
-        for entry in data["entry"]:
-            for messaging_event in entry["messaging"]:
-                if messaging_event.get("message"):
-                    sender_id = messaging_event["sender"]["id"]
-                    recipient_id = messaging_event["recipient"]["id"]
-                    user_reply = messaging_event["message"]["text"]
-                    handle_users_reply(sender_id, user_reply)
-                elif messaging_event.get("postback"):
-                    sender_id = messaging_event["sender"]["id"]
-                    recipient_id = messaging_event["recipient"]["id"]
-                    user_reply = messaging_event['postback']['payload']
-                    handle_users_reply(sender_id, user_reply)
+
+    if data["object"] != "page":
+        return "OK", 200
+
+    for entry in data["entry"]:
+        for messaging_event in entry["messaging"]:
+
+            sender_id = messaging_event["sender"]["id"]
+            if messaging_event.get("message"):
+                user_reply = messaging_event["message"]["text"]
+            elif messaging_event.get("postback"):
+                user_reply = messaging_event["postback"]["payload"]
+
+            handle_users_reply(sender_id, user_reply)
     return "OK", 200
 
 
