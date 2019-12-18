@@ -2,12 +2,11 @@
 Бот для пиццерии, работающий в Telegram и Facebook, серверная сторона которого реализована на
  [Moltin](https://www.moltin.com/).
 
-## Пример работы бота в Telegram:
-![](bot_samples/tg_bot_sample.gif)
+## Пример работы в Telegram:
+![](bot_sample.gif)
 
-## Пример работы бота в Facebook
-![](bot_samples/fb_bot_sample.gif)
-
+## Пример работы в Facebook
+![](fb_bot_sample.gif)
  
 ## Как настроить для работы с Telegram
 * Создайте файл `.env` и положите в папку со скриптами
@@ -65,21 +64,34 @@ GEOCODER_KEY=key
 
 Должен быть установлен `Python3` 
 
-Установить зависимости
+#### Установить зависимости
 ```bash
 pip install -r requirements.txt
 ```
-Загрузить продукты в Moltin
+#### Загрузить продукты в Moltin
 ```bash
 python load_products_to_moltin.py
 ```
 
-
-Запустить ботов для Telegram и Facebook
+#### Запустить бота для Telegram
 ```bash
 python tg_bot.py 
+```
+
+#### Запустить бота для Facebook
+Нужно использовать кэш, чтобы бот быстрее загружал меню. Для этого запустите скрипт
+```text
+python cache.py
+```
+После запуска скрипта запустите бота командой
+```text
+python fb_bot.py --cache
+```
+Если вы не хотите использовать кэш, тогда запуск бота выполняется командой
+```
 python fb_bot.py
 ```
+
 
 ## Развертывание на Heroku
 * Создайте приложение
