@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from moltin_api import add_product_to_cart, delete_product_from_cart
 from redis_db import get_database_connection
 from global_variables import PIZZA_CATEGORIES
+from utils import set_flag_for_using_cache
 from custom_logger import LogsHandler
 
 import traceback
@@ -127,6 +128,7 @@ def handle_users_reply(sender_id, user_reply):
     try:
         next_state = state_handler(sender_id, user_reply)
         database.set(formatted_sender_id, next_state)
+        # logger.info('firsfjlsfkslfsfksjf')
     except Exception as err:
         logger.exception(
             f'FB: Ошибка - {err}'
@@ -171,6 +173,9 @@ def webhook():
 
 if __name__ == '__main__':
     load_dotenv()
+
+    set_flag_for_using_cache()
+
     logger.addHandler(LogsHandler())
-    app.run(debug=True)
     logger.info('FB bot is running')
+    app.run(debug=True)

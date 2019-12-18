@@ -1,3 +1,4 @@
+import argparse
 import json
 import os
 import re
@@ -7,7 +8,15 @@ from geopy.distance import distance
 import requests
 import cyrtranslit
 
+import global_variables
 from global_variables import DELIVERY, PIZZA, MONEY_BAG, RUB, LIST
+
+
+def set_flag_for_using_cache():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--cache', action='store_true', help='arg for using cache or not')
+    args = parser.parse_args()
+    global_variables.use_cache = args.cache
 
 
 def get_product_info(product_data):
