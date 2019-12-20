@@ -1,7 +1,8 @@
 from cache import get_menu_from_cache
-from moltin_api import (get_file_by_id, get_products_of_category,
-                        get_all_categories, get_user_cart_item_ids,
-                        get_user_cart_items, get_user_cart)
+from moltin_api import (get_file_by_id, get_all_categories,
+                        get_user_cart_items, get_user_cart,
+                        get_products_of_category)
+import global_variables
 from global_variables import (SHOPPING_CART, CHECK_MARK, RUB, SHOPPING_BAGS,
                               CREDIT_CARD, PIZZERIA_LOGO_URL, LAST_CARD_IMG,
                               PIZZA, PIZZA_CATEGORIES, PLUS, CROSS_MARK,
@@ -58,7 +59,9 @@ def get_last_card_for_menu(current_category):
 
 
 def get_menu(category='Main'):
-    products = get_menu_from_cache()[category]
+
+    products = get_menu_from_cache()[category] \
+        if global_variables.use_cache else get_products_of_category(category)
     menu = get_main_card_for_menu()
     product_cards = [
         {

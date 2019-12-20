@@ -1,4 +1,5 @@
 import os
+import logging
 
 import requests
 from flask import Flask, request
@@ -9,14 +10,19 @@ from dotenv import load_dotenv
 from moltin_api import add_product_to_cart, delete_product_from_cart
 from redis_db import get_database_connection
 from global_variables import PIZZA_CATEGORIES
+from utils import set_flag_for_using_cache
+from custom_logger import LogsHandler
+
+import traceback
 
 
 app = Flask(__name__)
 database = None
+logger = logging.getLogger('FB logger')
 FACEBOOK_TOKEN = os.getenv("PAGE_ACCESS_TOKEN")
 
 
-def get_default_params(sender_id):
+def get_default_data_for_request(sender_id):
     params = {"access_token": FACEBOOK_TOKEN}
     headers = {"Content-Type": "application/json"}
     request_content = {
@@ -28,7 +34,7 @@ def get_default_params(sender_id):
 
 
 def send_message(sender_id, data, is_text_message=False):
-    params, headers, request_content = get_default_params(sender_id)
+    params, headers, request_content = get_default_data_for_request(sender_id)
 
     if is_text_message:
         request_content.update({"message": {"text": data}})
@@ -66,7 +72,7 @@ def handle_menu(sender_id, user_reply):
         send_message(sender_id, cart)
         return 'CART'
     elif user_reply == 'order':
-        pass
+        return 'MENU'
 
     callback_type, value = user_reply.split('_')
     if callback_type == 'add':
@@ -81,9 +87,9 @@ def handle_cart(sender_id, user_reply):
     if user_reply == 'menu':
         return handle_start(sender_id, '/start')
     elif user_reply == 'delivery':
-        pass
+        return 'CART'
     elif user_reply == 'pickup':
-        pass
+        return 'CART'
 
     callback_type, value = user_reply.split('_')
 
@@ -122,8 +128,12 @@ def handle_users_reply(sender_id, user_reply):
     try:
         next_state = state_handler(sender_id, user_reply)
         database.set(formatted_sender_id, next_state)
+        # logger.info('firsfjlsfkslfsfksjf')
     except Exception as err:
-        print(err)
+        logger.exception(
+            f'FB: Ошибка - {err}'
+            f'{traceback.format_exc()}'
+        )
 
 
 @app.route('/', methods=['GET'])
@@ -144,22 +154,28 @@ def webhook():
     Основной вебхук, на который будут приходить сообщения от Facebook.
     """
     data = request.get_json()
-    if data["object"] == "page":
-        for entry in data["entry"]:
-            for messaging_event in entry["messaging"]:
-                if messaging_event.get("message"):
-                    sender_id = messaging_event["sender"]["id"]
-                    recipient_id = messaging_event["recipient"]["id"]
-                    user_reply = messaging_event["message"]["text"]
-                    handle_users_reply(sender_id, user_reply)
-                elif messaging_event.get("postback"):
-                    sender_id = messaging_event["sender"]["id"]
-                    recipient_id = messaging_event["recipient"]["id"]
-                    user_reply = messaging_event['postback']['payload']
-                    handle_users_reply(sender_id, user_reply)
+
+    if data["object"] != "page":
+        return "OK", 200
+
+    for entry in data["entry"]:
+        for messaging_event in entry["messaging"]:
+
+            sender_id = messaging_event["sender"]["id"]
+            if messaging_event.get("message"):
+                user_reply = messaging_event["message"]["text"]
+            elif messaging_event.get("postback"):
+                user_reply = messaging_event["postback"]["payload"]
+
+            handle_users_reply(sender_id, user_reply)
     return "OK", 200
 
 
 if __name__ == '__main__':
     load_dotenv()
+
+    set_flag_for_using_cache()
+
+    logger.addHandler(LogsHandler())
+    logger.info('FB bot is running')
     app.run(debug=True)

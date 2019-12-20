@@ -31,3 +31,5 @@ PIZZA_CATEGORIES = {
         'Special': 'Особые',
         'Nutritious': 'Сытные'
     }
+
+use_cache = False
